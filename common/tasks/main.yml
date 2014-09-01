@@ -31,3 +31,22 @@
 
 - name: apt-get install sshguard
   apt: name=sshguard
+
+- name: configure sshd_config
+  lineinfile: dest=/etc/ssh/sshd_config
+              owner=root group=root mode=0644
+              backup=yes
+              "regexp={{ item.regexp }}"
+              "line={{ item.line }}"
+              "insertafter={{ item.insertafter }}"
+  with_items:
+    - regexp: '^PasswordAuthentication'
+      line: 'PasswordAuthentication no'
+      insertafter: '#PasswordAuthentication'
+    - regexp: '^PermitRootLogin'
+      line: 'PermitRootLogin no'
+      insertafter: '#PermitRootLogin'
+    - regexp: '^GSSAPIAuthentication'
+      line: 'GSSAPIAuthentication no'
+      insertafter: '#GSSAPIAuthentication'
+  notify: restart sshd

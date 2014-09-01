@@ -4,3 +4,10 @@
   apt: pkg={{ item }}
   with_items:
     - nodejs
+
+- name: Add ClientAliveInterval directive into sshd_config for capistrano migration
+  lineinfile: "dest=/etc/ssh/sshd_config
+               regexp='^ClientAliveInterval 30'
+               line='ClientAliveInterval 30'
+               insertafter='^#UseLogin no'"
+  notify: restart sshd
