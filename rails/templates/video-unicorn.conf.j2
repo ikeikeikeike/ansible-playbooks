@@ -1,0 +1,22 @@
+description "Start the Unicorn to video application. Run the Unicorn Workers for Rails Application"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+console owner
+
+env HOME=/home/{{ username }}
+env RBENV_ROOT=/home/{{ username }}/.rbenv
+env PATH="/home/{{ username }}/.rbenv/shims:/home/{{ username }}/.rbenv/bin:/usr/local/rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
+env RAILS_ENV=production
+
+#setuid {{ username }}
+#setgid {{ username }}
+
+chdir /home/{{ username }}/var/current
+
+script
+  exec sudo -u {{ username }} env PATH=$PATH bundle exec unicorn_rails -c config/unicorn/production.rb -E $RAILS_ENV -p 5700 >> /tmp/upstart.log 2>&1
+end script
+
+respawn limit 10 5

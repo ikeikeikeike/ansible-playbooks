@@ -23,3 +23,11 @@
             owner={{ username }}
             group={{ username }}
             mode=0644
+
+- name: nopassword configuration
+  lineinfile: dest=/etc/sudoers.d/{{ username }}
+              backrefs=false
+              create=yes
+              mode=0440
+              line="{{ username }} ALL=(ALL) NOPASSWD:ALL"
+              validate='visudo -cf %s'
