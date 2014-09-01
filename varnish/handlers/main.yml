@@ -1,0 +1,10 @@
+# file: varnish/handlers/main.yml
+---
+
+- name: restart varnish
+  service: name=varnish state=restarted
+  sudo: yes
+
+- name: reload varnish
+  service: name=varnish state=reloaded
+  sudo: yes

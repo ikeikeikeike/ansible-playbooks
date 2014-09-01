@@ -1,0 +1,37 @@
+# file: nginx/tasks/main.yml
+---
+
+# install, update, register service.
+
+# - name: apt-get update
+  # apt: update_cache=yes
+
+# - name: apt-get upgrade
+  # apt: upgrade=full
+
+- name: apt-get install nginx
+  apt: name=nginx
+
+- name: start nginx service
+  service: name=nginx state=started enabled=yes
+
+
+# Configurations
+
+- name: Overwrite nginx.conf
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  notify: restart nginx
+
+- name: Create video configuration to sites-availavle
+  template: src=video.j2 dest=/etc/nginx/sites-available/video
+  notify: restart nginx
+
+- name: Video configuraitons to conf.d dir.
+  template: src=video.conf.j2 dest=/etc/nginx/conf.d/video.conf
+  notify: restart nginx
+
+- name: symbolic link from sites-availavle to sites-enabled
+  file: src=/etc/nginx/sites-available/video
+        dest=/etc/nginx/sites-enabled/video
+        state=link
+  notify: restart nginx

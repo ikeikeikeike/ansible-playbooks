@@ -1,0 +1,34 @@
+# file: postgresql/tasks/main.yml
+---
+
+# install, update, register service.
+
+- name: rbenv | install build depends
+  apt: pkg={{ item }}
+  with_items:
+    - libpq5
+    - libpq-dev
+    - postgresql-9.3
+    - postgresql-client-9.3
+    - postgresql-server-dev-9.3
+    - postgresql-contrib-9.3
+
+- name: start postgresql service
+  service: name=postgresql state=started enabled=yes
+
+- name: install psycopg2 python module
+  pip: name=psycopg2
+
+# Create databse and user.
+
+- name: create database
+  postgresql_db: name={{ dbname }}
+  sudo_user: postgres
+
+- name: create db user
+  postgresql_user: db={{ dbname }} name={{ dbuser }} password={{ dbpass }}
+  sudo_user: postgres
+
+# - name: create user role
+  # postgresql_user: name={{ dbuser }} role_attr_flags=NOSUPERUSER,NOCREATEDB
+  # sudo_user: postgres

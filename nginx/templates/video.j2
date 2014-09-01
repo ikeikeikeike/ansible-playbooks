@@ -1,0 +1,75 @@
+  upstream video_backend {
+    server 127.0.0.1:5700;
+  }
+
+  server {
+    listen 8080;
+    server_name {{ inventory_hostname }};
+
+    root /home/{{ username }}/var/current/public;
+
+    access_log /var/log/nginx/video_access.log varnish;
+    error_log /var/log/nginx/video_error.log;
+
+    proxy_connect_timeout 300;
+    proxy_read_timeout    300;
+    proxy_send_timeout    300;
+
+    location / {
+
+      # 静的ファイルは location ~* を見るように
+      if (-f $request_filename) {
+        break;
+      }
+
+      set $mobile 0;
+      if ( $http_user_agent ~* (Android|iPhone) ) {
+          # モバイルかの場合、変数に"1"をセット
+          set $mobile 1;
+      }
+
+      # Caching extension below + get method
+      set $do_not_cache 0;
+      if ($request_method != GET) {
+          set $do_not_cache 1;
+      }
+
+      # ignore sid in cookie
+#      if ( $http_cookie ~* sid ) {
+#          set $do_not_cache 1;
+#      }
+
+      # Proxy cache configurations
+      proxy_no_cache        $do_not_cache;
+      proxy_cache_bypass    $do_not_cache;
+      proxy_cache           cache_static_file;
+      proxy_cache_key       $scheme$host$uri$is_args$args$mobile;
+      proxy_cache_valid     200 302 5m;  # cache time
+      proxy_cache_valid     any 1m;
+
+      # proxy先のstatusも見てカスタムのエラーページを表示
+      proxy_intercept_errors on;
+
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      proxy_pass http://video_backend;
+    }
+
+    location ~* \.(xml\.gz)(\?[0-9]+)?$ {
+      # 上記拡張子をno cache
+      break;
+    }
+
+    location /browserconfig.xml {
+      # 上記拡張子を1日cache
+      expires 1d;
+    }
+
+    location ~* \.(pdf|ico|css|js|gif|jpe?g|png|ttf|eot|svg|woff|test)(\?[0-9]+)?$ {
+      # 上記拡張子を1日cache
+      expires 1d;
+    }
+
+  }

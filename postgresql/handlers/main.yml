@@ -1,0 +1,10 @@
+# file: postgresql/handlers/main.yml
+---
+
+- name: restart postgresql
+  service: name=postgresql state=restarted
+  sudo: yes
+
+- name: reload postgresql
+  service: name=postgresql state=reloaded
+  sudo: yes

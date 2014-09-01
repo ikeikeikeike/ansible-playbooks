@@ -1,0 +1,110 @@
+backend default {
+    .host = "127.0.0.1";
+    .port = "8080";
+}
+
+
+sub detect_device {
+    # Define the desktop device
+    set req.http.X-Device = "desktop";
+
+    if (req.http.User-Agent ~ "iP(hone|od)" || req.http.User-Agent ~ "Android" || req.http.User-Agent ~ "iPad") {
+        # Define smartphones and tablets
+        set req.http.X-Device = "smart";
+    }
+
+    elseif (req.http.User-Agent ~ "SymbianOS" || req.http.User-Agent ~ "^BlackBerry" ||
+            req.http.User-Agent ~ "^SonyEricsson" || req.http.User-Agent ~ "^Nokia" ||
+            req.http.User-Agent ~ "^SAMSUNG" || req.http.User-Agent ~ "^LG"
+    ) {
+        # Define every other mobile device
+        set req.http.X-Device = "other";
+    }
+}
+
+
+sub vcl_recv {
+    call detect_device;
+
+    # Varnish の grace モードでは、expire 後に複数リクエストがあった時
+    # 1リクエストだけはキャッシュを更新するためにオリジンサーバにコンテンツをリクエストし
+    # 残りのリクエストは grace 期間内であれば expire した(=stale)
+    # キャッシュコンテンツをクライアントに即座に返す。
+    set req.grace = 300s;
+
+    if (req.url == "/lifecheck.txt") {
+        return (error);
+    }
+
+    if (req.restarts == 0) {
+        if (req.http.x-forwarded-for) {
+            set req.http.X-Forwarded-For =
+                req.http.X-Forwarded-For + ", " + client.ip;
+        } else {
+            set req.http.X-Forwarded-For = client.ip;
+        }
+    }
+
+    if (req.request != "GET" && req.request != "HEAD") {
+        return (pass);
+    }
+
+    if (req.http.Authorization) {
+        return (pass);
+    }
+
+    if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+            # No point in compressing these
+            remove req.http.Accept-Encoding;
+        }
+        elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        }
+        else {
+            # Unknown or deflate algorithm
+            remove req.http.Accept-Encoding;
+        }
+    }
+
+    return(lookup);
+}
+
+sub vcl_fetch {
+    return(deliver);
+}
+
+sub vcl_hash {
+    if (req.http.X-Device ~ "smart" || req.http.X-Device ~ "other") {
+        hash_data(req.http.X-Device);
+    }
+
+    hash_data(req.http.Accept);
+
+    hash_data(req.url);
+
+    if (req.http.host) {
+        hash_data(req.http.host);
+    } else {
+        hash_data(server.ip);
+    }
+
+    return (hash);
+}
+
+sub vcl_error {
+    set obj.http.Content-Type = "text/plain; charset=utf-8";
+    if (req.url == "/lifecheck.txt") {
+        set obj.status = 200;
+        synthetic {"lifecheck"};
+    }
+    return (deliver);
+}
+
+# sub vcl_deliver {
+    # if (obj.hits > 0) {
+        # set resp.http.X-Cache = "HIT";
+    # } else {
+        # set resp.http.X-Cache = "MISS";
+    # }
+# }

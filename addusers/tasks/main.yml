@@ -1,0 +1,25 @@
+# Create Linux user.
+
+- name: create linux user
+  user: name={{ username }} password={{ password }}
+
+- name: create directory
+  file: dest=/home/{{ username }}/.ssh
+        owner={{ username }}
+        group={{ username }}
+        mode=700
+        state=directory
+
+- name: private key for bitbucket.
+  template: src={{ username }}/id_rsa
+            dest=/home/{{ username }}/.ssh/id_rsa
+            owner={{ username }}
+            group={{ username }}
+            mode=0644
+
+- name: public key for login. note> overwrite
+  template: src={{ username }}/id_rsa.pub
+            dest=/home/{{ username }}/.ssh/authorized_keys
+            owner={{ username }}
+            group={{ username }}
+            mode=0644

@@ -1,0 +1,22 @@
+# Proxy cache configuration
+#
+proxy_cache_path /tmp/static_file_cache levels=1:2 keys_zone=cache_static_file:512m inactive=5d max_size=1024m;
+proxy_temp_path /tmp/temp;
+
+
+# $remote_addr    : クライアントのIPアドレス
+# $remote_user    : クライアントのユーザ名
+# $time_local     : アクセス日時
+# $request        : httpの要求URI
+# $status         : httpのステータス
+# $body_bytes_sent: 送信バイト数
+# $http_referer   : リファラーURL（遷移元URL）
+# $http_user_agent: ユーザエージェント情報（ブラウザ名・バージョン等）
+
+log_format varnish '$proxy_add_x_forwarded_for - $remote_user [$time_local] '
+                   '"$request" $status $body_bytes_sent '
+                   '"$http_referer" "$http_user_agent"';
+
+#log_format combined '$remote_addr - $remote_user [$time_local] '
+#                    '"$request" $status $body_bytes_sent '
+#                    '"$http_referer" "$http_user_agent"';

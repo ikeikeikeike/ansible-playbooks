@@ -1,0 +1,44 @@
+# file: elasticsearch/tasks/main.yml
+---
+
+# install, update, register service.
+
+# - name: apt-get update
+  # apt: update_cache=yes
+
+# - name: apt-get upgrade
+  # apt: upgrade=full
+
+- name: apt-get install openjdk-7-jre-headless
+  apt: name=openjdk-7-jre-headless
+
+- name: download elasticsearch
+  get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.deb
+           dest=/usr/local/src/elasticsearch-1.3.2.deb
+
+- name: Check if elasticsearch is installed
+  command: dpkg -l elasticsearch
+  register: is_installed_elasticsearch
+  ignore_errors: True
+
+- name: install elasticsearch by dpkg
+  command: dpkg -i /usr/local/src/elasticsearch-1.3.2.deb
+  when: is_installed_elasticsearch.stdout.find('elasticsearch') == -1
+
+- name: start elasticsearch service
+  service: name=elasticsearch state=started enabled=yes
+
+- stat: path=/usr/share/elasticsearch/plugins/analysis-kuromoji
+  register: kuromoji_path
+
+- name: download kuromoji plugin for elasticsearch.
+  command: /usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-analysis-kuromoji/2.3.0
+  notify: restart elasticsearch
+  when: kuromoji_path.stat.exists == False
+
+
+# Configurations
+
+- name: Overwrite /etc/elasticsearch/elasticsearch.yml
+  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch

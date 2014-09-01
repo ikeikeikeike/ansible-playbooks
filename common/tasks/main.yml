@@ -1,0 +1,33 @@
+---
+
+- name: apt-get update
+  apt: update_cache=yes
+
+- name: apt-get upgrade
+  apt: upgrade=full
+
+- name: apt-get install build-essential
+  apt: name=build-essential
+
+# Utility
+
+- name: Install system utility
+  apt: pkg={{ item }}
+  with_items:
+    - htop
+    - git-core
+    - sysv-rc-conf
+
+
+# Python
+
+- name: Install Python packages
+  apt: pkg={{ item }}
+  with_items:
+    - python-dev
+    - python-pip
+
+# Secure
+
+- name: apt-get install sshguard
+  apt: name=sshguard

@@ -1,0 +1,30 @@
+# file: varnish/tasks/main.yml
+---
+
+# install, update, register service.
+
+# - name: apt-get update
+  # apt: update_cache=yes
+
+# - name: apt-get upgrade
+  # apt: upgrade=full
+
+- name: apt-get install varnish
+  apt: name=varnish
+
+- name: apt-get install libvarnishapi-dev
+  apt: name=libvarnishapi-dev
+
+- name: start varnish service
+  service: name=varnish state=started enabled=yes
+
+
+# Configurations
+
+- name: Overwrite /etc/default/varnish
+  template: src=varnish.j2 dest=/etc/default/varnish
+  notify: restart varnish
+
+- name: Overwrite /etc/varnish/default.vcl
+  template: src=default.vcl.j2 dest=/etc/varnish/default.vcl
+  notify: restart varnish

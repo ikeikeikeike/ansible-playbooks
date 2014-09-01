@@ -1,0 +1,27 @@
+# file: monit/tasks/main.yml
+---
+
+# install, update, register service.
+
+# - name: apt-get update
+  # apt: update_cache=yes
+
+# - name: apt-get upgrade
+  # apt: upgrade=full
+
+- name: apt-get install monit
+  apt: name=monit
+
+- name: start monit service
+  service: name=monit state=started enabled=yes
+
+
+# Configurations
+
+- name: Create monitering file for varnishd. /etc/monit/conf.d/varnishd
+  template: src=varnishd.j2 dest=/etc/monit/conf.d/varnishd
+  notify: restart monit
+
+- name: Overwrite /etc/monit/monitrc
+  template: src=monitrc.j2 dest=/etc/monit/monitrc mode=0600
+  notify: restart monit
