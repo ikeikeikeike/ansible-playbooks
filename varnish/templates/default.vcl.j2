@@ -24,12 +24,11 @@ sub detect_device {
 
 
 sub vcl_recv {
+
     call detect_device;
 
-    # Varnish の grace モードでは、expire 後に複数リクエストがあった時
-    # 1リクエストだけはキャッシュを更新するためにオリジンサーバにコンテンツをリクエストし
-    # 残りのリクエストは grace 期間内であれば expire した(=stale)
-    # キャッシュコンテンツをクライアントに即座に返す。
+    # About graceful mode: >
+    #   http://siguniang.wordpress.com/2013/10/22/varnish-cache-grace-saint-god/
     set req.grace = 300s;
 
     if (req.url == "/lifecheck.txt") {
@@ -75,12 +74,17 @@ sub vcl_fetch {
 }
 
 sub vcl_hash {
-    if (req.http.X-Device ~ "smart" || req.http.X-Device ~ "other") {
-        hash_data(req.http.X-Device);
-    }
 
+    # Cookie毎にキャッシュ
+    hash_data(req.http.cookie);
+
+    # Device毎にキャッシュ
+    hash_data(req.http.X-Device);
+
+    # HTML, JS, CSS毎にキャッシュ
     hash_data(req.http.Accept);
 
+    # URL毎にキャッシュ
     hash_data(req.url);
 
     if (req.http.host) {
