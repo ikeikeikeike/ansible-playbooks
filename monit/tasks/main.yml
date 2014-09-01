@@ -3,12 +3,6 @@
 
 # install, update, register service.
 
-# - name: apt-get update
-  # apt: update_cache=yes
-
-# - name: apt-get upgrade
-  # apt: upgrade=full
-
 - name: apt-get install monit
   apt: name=monit
 
@@ -22,6 +16,8 @@
   template: src=varnishd.j2 dest=/etc/monit/conf.d/varnishd
   notify: restart monit
 
-- name: Overwrite /etc/monit/monitrc
-  template: src=monitrc.j2 dest=/etc/monit/monitrc mode=0600
+- name: replace /etc/monit/monitrc
+  lineinfile: dest=/etc/monit/monitrc
+              regexp='^  set daemon 120'
+              line='  set daemon 20'
   notify: restart monit

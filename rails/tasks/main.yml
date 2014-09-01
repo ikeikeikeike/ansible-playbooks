@@ -1,0 +1,6 @@
+---
+
+- name: Install based libraries for rails
+  apt: pkg={{ item }}
+  with_items:
+    - nodejs

@@ -3,12 +3,6 @@
 
 # install, update, register service.
 
-# - name: apt-get update
-  # apt: update_cache=yes
-
-# - name: apt-get upgrade
-  # apt: upgrade=full
-
 - name: apt-get install openjdk-7-jre-headless
   apt: name=openjdk-7-jre-headless
 
@@ -39,6 +33,37 @@
 
 # Configurations
 
-- name: Overwrite /etc/elasticsearch/elasticsearch.yml
-  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+- name: replace elasticsearch.yml for cluster.name directive
   notify: restart elasticsearch
+  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               regexp='^#cluster.name: elasticsearch'
+               line='cluster.name: elasticsearch_video_automation'
+               backrefs=yes"
+
+- name: replace elasticsearch.yml for node.name directive
+  notify: restart elasticsearch
+  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               regexp='^#node.name: \"Franz Kafka\"'
+               line='node.name: \"{{ inventory_hostname }}\"'
+               backrefs=yes"
+
+- name: replace elasticsearch.yml for network.host directive
+  notify: restart elasticsearch
+  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               regexp='^#network.host: 192.168.0.1'
+               line='network.host: 127.0.0.1'
+               backrefs=yes"
+
+- name: replace elasticsearch.yml for index.analysis.analyzer.default.type directive
+  notify: restart elasticsearch
+  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               regexp='^index.analysis.analyzer.default.type: custom'
+               line='index.analysis.analyzer.default.type: custom'
+               insertafter='^network.host: 127.0.0.1'"
+
+- name: replace elasticsearch.yml for directive
+  notify: restart elasticsearch
+  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               regexp='^index.analysis.analyzer.default.tokenizer: kuromoji_tokenizer'
+               line='index.analysis.analyzer.default.tokenizer: kuromoji_tokenizer'
+               insertafter='^index.analysis.analyzer.default.type: custom'"

@@ -18,8 +18,16 @@
 
 # Configurations
 
-- name: Overwrite nginx.conf
-  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+- name: replace nginx.conf for worker_connections directive
+  lineinfile: dest=/etc/nginx/nginx.conf
+              regexp='worker_connections 768;'
+              line='\tuse epoll;\n\tworker_connections 1024;'
+  notify: restart nginx
+
+- name: replace nginx.conf for server_tokens directive
+  lineinfile: dest=/etc/nginx/nginx.conf
+              regexp='# server_tokens off;'
+              line='\tserver_tokens off;'
   notify: restart nginx
 
 - name: Create video configuration to sites-availavle
