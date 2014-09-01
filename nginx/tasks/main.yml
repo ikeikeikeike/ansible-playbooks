@@ -22,12 +22,18 @@
   lineinfile: dest=/etc/nginx/nginx.conf
               regexp='worker_connections 768;'
               line='\tuse epoll;\n\tworker_connections 1024;'
+              backrefs=yes
   notify: restart nginx
 
 - name: replace nginx.conf for server_tokens directive
   lineinfile: dest=/etc/nginx/nginx.conf
               regexp='# server_tokens off;'
               line='\tserver_tokens off;'
+              backrefs=yes
+  notify: restart nginx
+
+- name: remove default configuration
+  file: name=/etc/nginx/sites-enabled/default state=absent
   notify: restart nginx
 
 - name: Create video configuration to sites-availavle
