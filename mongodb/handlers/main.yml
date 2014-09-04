@@ -1,0 +1,10 @@
+# file: mongodb/handlers/main.yml
+---
+
+- name: restart mongodb
+  service: name=mongodb state=restarted
+  sudo: yes
+
+- name: reload mongodb
+  service: name=mongodb state=reloaded
+  sudo: yes

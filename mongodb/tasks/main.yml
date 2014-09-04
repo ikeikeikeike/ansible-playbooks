@@ -1,0 +1,51 @@
+# file: mongodb/tasks/main.yml
+---
+
+- name: Install mongodb packages
+  apt: pkg={{ item }}
+  with_items:
+    - mongodb
+    - mongodb-dev
+    - mongodb-server
+    - mongodb-clients
+
+- name: start mongodb service
+  service: name=mongodb state=started enabled=yes
+
+- name: install pymongo python module
+  pip: name=pymongo
+
+# Create User
+
+
+- name: Create mongodb user
+  mongodb_user: database=admin
+                name={{ mongodb_user }}
+                password={{  mongodb_pass }}
+                roles='userAdminAnyDatabase'
+                state=present
+
+
+# Configurations
+
+
+- name: replace mongodb.conf for bind_ip directive
+  notify: restart mongodb
+  lineinfile: dest=/etc/mongodb.conf
+              regexp='^bind_ip = 127.0.0.1'
+              line='bind_ip = 0.0.0.0'
+              backrefs=yes
+
+- name: replace mongodb.conf for auth directive
+  notify: restart mongodb
+  lineinfile: dest=/etc/mongodb.conf
+              regexp='^#auth = true'
+              line='auth = true'
+              backrefs=yes  #' bugfix syntaxhighlight
+
+- name: replace mongodb.conf for setParametera and enableLocalhostAuthBypass directive
+  notify: restart mongodb
+  lineinfile: dest=/etc/mongodb.conf
+              regexp='^setParameter = enableLocalhostAuthBypass=0'
+              line='setParameter = enableLocalhostAuthBypass=0'
+              insertafter='^auth = true'  #' bugfix syntaxhighlight
