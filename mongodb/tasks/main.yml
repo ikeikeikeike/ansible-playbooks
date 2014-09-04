@@ -15,15 +15,27 @@
 - name: install pymongo python module
   pip: name=pymongo
 
+
 # Create User
 
 
-- name: Create mongodb user
+- name: Create mongodb admin
   mongodb_user: database=admin
                 name={{ mongodb_user }}
-                password={{  mongodb_pass }}
-                roles='userAdminAnyDatabase'
-                state=present
+                password={{ mongodb_pass }}
+                roles='dbAdminAnyDatabase,readWriteAnyDatabase,userAdminAnyDatabase,clusterAdmin'
+
+- name: Create mongodb video
+  mongodb_user: database=video
+                name={{ mongodb_user }}
+                password={{ mongodb_pass }}
+                roles='dbAdmin,readWrite,userAdmin'
+
+- name: Create mongodb {{ mongodb_name }}
+  mongodb_user: database={{ mongodb_name }}
+                name={{ mongodb_user }}
+                password={{ mongodb_pass }}
+                roles='dbAdmin,readWrite,userAdmin'
 
 
 # Configurations
