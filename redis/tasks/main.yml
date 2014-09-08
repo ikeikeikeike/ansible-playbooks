@@ -1,0 +1,13 @@
+# file: redis/tasks/main.yml
+---
+
+# install, update, register service.
+
+- name: Install Redis packages
+  apt: pkg={{ item }}
+  with_items:
+    - redis-server
+    - redis-tools
+
+- name: start redis service
+  service: name=redis-server state=started enabled=yes

@@ -21,3 +21,11 @@
 
 - name: register video-unicorn service
   service: name=video-unicorn state=started enabled=yes
+
+
+# varnish
+
+
+- name: change 0644 permission to varnish/secret.
+  file: path=/etc/varnish/secret state=directory mode=0644
+

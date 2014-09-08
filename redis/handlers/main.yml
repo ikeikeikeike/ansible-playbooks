@@ -1,0 +1,10 @@
+# file: redis/handlers/main.yml
+---
+
+- name: restart redis
+  service: name=redis-server state=restarted
+  sudo: yes
+
+- name: reload redis
+  service: name=redis-server state=reloaded
+  sudo: yes

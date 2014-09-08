@@ -1,0 +1,10 @@
+# file: memcached/handlers/main.yml
+---
+
+- name: restart memcached
+  service: name=memcached state=restarted
+  sudo: yes
+
+- name: reload memcached
+  service: name=memcached state=reloaded
+  sudo: yes

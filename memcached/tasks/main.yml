@@ -1,0 +1,12 @@
+# file: memcached/tasks/main.yml
+---
+
+# install, update, register service.
+
+- name: Install Memcached packages
+  apt: pkg={{ item }}
+  with_items:
+    - memcached
+
+- name: start memcached service
+  service: name=memcached state=started enabled=yes
