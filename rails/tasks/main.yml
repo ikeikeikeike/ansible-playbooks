@@ -21,6 +21,7 @@
 
 - name: register video-unicorn service
   service: name=video-unicorn state=started enabled=yes
+  ignore_errors: yes
 
 
 # varnish
