@@ -24,6 +24,13 @@
             group={{ username }}
             mode=0644
 
+- name: add bash_profile note> overwrite
+  template: src=bash_profile.j2
+            dest=/home/{{ username }}/.bash_profile
+            owner={{ username }}
+            group={{ username }}
+            mode=0644
+
 - name: nopassword configuration
   lineinfile: dest=/etc/sudoers.d/{{ username }}
               backrefs=false

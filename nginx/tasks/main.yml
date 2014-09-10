@@ -49,7 +49,3 @@
         dest=/etc/nginx/sites-enabled/video
         state=link
   notify: restart nginx
-
-- name: stop tty1
-  service: name=tty1 state=stopped
-  ignore_errors: yes
