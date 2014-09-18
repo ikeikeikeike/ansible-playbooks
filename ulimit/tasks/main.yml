@@ -1,0 +1,42 @@
+- name: Change ulimit for Nginx
+  notify: restart nginx
+  ignore_errors: yes
+  lineinfile: dest=/etc/default/nginx
+              regexp='^#ULIMIT="-n 4096"'
+              line='ULIMIT="-n 65536"'
+              backrefs=yes
+
+- name: Change ulimit for Redis.
+  notify: restart redis
+  ignore_errors: yes
+  lineinfile: dest=/etc/default/redis-server
+              regexp='^# ULIMIT=65536'
+              line='ULIMIT=65536'
+              backrefs=yes
+
+- name: Change ulimit for memcached.
+  notify: restart memcached
+  ignore_errors: yes
+  lineinfile: dest=/etc/memcached.conf
+              regexp='^# -c 1024'
+              line='-c 65536'
+              backrefs=yes
+
+- name: Change ulimit for something(postgresql, elasticsearch).
+  template: src=initscript.j2
+            dest=/etc/initscript
+            owner=root
+            group=root
+            mode=0644
+
+- name: Change ulimit for auth daemon.
+  lineinfile: dest=/etc/security/limits.conf
+              regexp='^\* soft nofile 65536'
+              line='* soft nofile 65536'
+              insertafter='^# End of file'
+
+- name: Change ulimit for auth daemon2.
+  lineinfile: dest=/etc/security/limits.conf
+              regexp='^\* hard nofile 65536'
+              line='* hard nofile 65536'
+              insertafter='^\* soft nofile 65536'

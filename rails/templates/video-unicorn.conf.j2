@@ -13,6 +13,9 @@ env RAILS_ENV=production
 #setuid {{ username }}
 #setgid {{ username }}
 
+limit nofile 65536 65536
+#limit memlock 82000 82000
+
 chdir /home/{{ username }}/var/current
 
 script
