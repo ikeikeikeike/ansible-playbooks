@@ -1,0 +1,17 @@
+/home/{{ username }}/var/current/log/*.log {
+    daily
+    missingok
+    rotate 32
+    compress
+    delaycompress
+    notifempty
+    create 0640 {{ username }} {{ username }}
+    su {{ username }} {{ username }}
+    sharedscripts
+
+    # Send USR1 signal to unicorn master process.
+    lastaction
+        pid=/tmp/{{ username }}-unicorn.pid
+        test -s $pid && kill -USR1 "$(cat $pid)"
+    endscript
+}
