@@ -62,11 +62,6 @@
       break;
     }
 
-    location /browserconfig.xml {
-      # 上記拡張子を1日cache
-      expires 1d;
-    }
-
     location ~* \.(pdf|ico|css|js|gif|jpe?g|png|ttf|eot|svg|woff|test)(\?[0-9]+)?$ {
       # 上記拡張子を1日cache
       expires 1d;
