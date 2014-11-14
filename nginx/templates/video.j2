@@ -57,6 +57,11 @@
       proxy_pass http://video_backend;
     }
 
+    location /_/scs/apps-static/ {
+        # for googleplus counter
+        break;
+    }
+
     location ~* \.(xml\.gz)(\?[0-9]+)?$ {
       # 上記拡張子をno cache
       break;
