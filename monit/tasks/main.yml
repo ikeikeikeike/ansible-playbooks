@@ -20,4 +20,5 @@
   lineinfile: dest=/etc/monit/monitrc
               regexp='^  set daemon 120'
               line='  set daemon 20'
+              backrefs=yes
   notify: restart monit
