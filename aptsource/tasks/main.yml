@@ -1,0 +1,15 @@
+---
+
+- name: Replace aptsource to japanese hosting server(jaist).
+  notify: apt-get update
+  replace: dest=/etc/apt/sources.list
+           regexp='http:\/\/archive.ubuntu.com'
+           replace='http://ftp.jaist.ac.jp'
+           backup=yes
+
+- name: Replace aptsource to japanese hosting server(jp.archive.ubuntu).
+  notify: apt-get update
+  replace: dest=/etc/apt/sources.list
+           regexp='http:\/\/security.ubuntu.com'
+           replace='http://jp.archive.ubuntu.com'
+           backup=yes
