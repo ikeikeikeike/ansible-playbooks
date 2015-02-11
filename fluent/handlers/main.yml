@@ -1,0 +1,10 @@
+# file: fluent/handlers/main.yml
+---
+
+- name: restart td-agent
+  service: name=td-agent state=restarted enabled=yes
+  sudo: yes
+
+- name: reload redis
+  service: name=td-agent state=reloaded
+  sudo: yes
