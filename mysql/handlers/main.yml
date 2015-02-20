@@ -1,0 +1,10 @@
+# file: mysql/handlers/main.yml
+---
+
+- name: restart mysql
+  service: name=mysql state=restarted
+  sudo: yes
+
+- name: reload mysql
+  service: name=mysql state=reloaded
+  sudo: yes
