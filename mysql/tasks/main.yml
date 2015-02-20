@@ -1,0 +1,35 @@
+# file: mysql/tasks/main.yml
+---
+
+# install, update, register service.
+
+- name: MySQL | install build depends
+  apt: pkg={{ item }}
+  with_items:
+    - mysql-server-5.6
+    - mysql-client-5.6
+    - mysql-common-5.6
+    - libmysqld-dev
+    - libmysqlclient-dev
+    - python-mysqldb
+
+- name: start mysql service
+  service: name=mysql state=started enabled=yes
+
+# Change root password
+
+- name: change root password
+  mysql_user: name=root password={{dbpass}}
+
+- name: set my.cnf for nopass login
+  template: src=my.cnf dest=/root/.my.cnf owner=root mode=0600
+
+# Create databse and user.
+
+- name: create database
+  mysql_db: name={{ dbname }}
+
+- name: create db user
+  mysql_user: name={{ dbuser }} 
+              password={{ dbpass }} 
+              priv=*.*:ALL state=present
