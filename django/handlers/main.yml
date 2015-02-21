@@ -1,0 +1,10 @@
+# file: django/handlers/main.yml
+---
+
+- name: restart gunicorn
+  service: name=gunicorn state=restarted
+  sudo: yes
+
+- name: reload gunicorn
+  service: name=gunicorn state=reloaded
+  sudo: yes
