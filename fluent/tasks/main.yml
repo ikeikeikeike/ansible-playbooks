@@ -12,18 +12,36 @@
   apt_key: url=http://packages.treasuredata.com/GPG-KEY-td-agent state=present
 
 - name: Add apt repository
-  apt_repository: repo='deb http://packages.treasuredata.com/2/ubuntu/trusty/ trusty contrib' state=present
-  when: ansible_distribution_version == '14.04'
-
-- name: Add apt repository
-  apt_repository: repo='deb http://packages.treasuredata.com/2/ubuntu/precise/ precise contrib' state=present
-  when: ansible_distribution_version == '12.04'
-
-- name: Add apt repository
-  apt_repository: repo='deb http://packages.treasuredata.com/2/ubuntu/lucid/ contrib' state=present
-  when: ansible_distribution_version == '10.04'
+  apt_repository: repo='deb [arch=amd64] http://packages.treasuredata.com/2/ubuntu/trusty/ trusty contrib' state=present
 
 - name: apt-get td-agent
   apt: name=td-agent update_cache=yes force=yes
-  notify:
-    - restart td-agent
+  notify: restart td-agent
+
+# plugin
+
+- name: Install plugin
+  gem: name=fluent-plugin-s3
+       state=present 
+       executable=/opt/td-agent/embedded/bin/fluent-gem 
+       include_dependencies=yes
+  notify: restart td-agent
+
+# configuration
+
+- name: td-agent location config file directory
+  file: path=/etc/td-agent/conf.d 
+        state=directory 
+        owner=root group=root mode=0755
+
+- name: fluent | overwrite fluent initialization to configuration file
+  template: src=s3.conf.j2
+            dest=/etc/td-agent/conf.d/s3.conf
+            owner=root group=root mode=0755
+
+- name: replace td-agent.conf for include directive
+  lineinfile: dest=/etc/td-agent/td-agent.conf
+              regexp='## Examples:'
+              line='@include conf.d/*.conf'
+              backrefs=yes
+  notify: restart td-agent
