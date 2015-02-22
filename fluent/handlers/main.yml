@@ -2,9 +2,9 @@
 ---
 
 - name: restart td-agent
-  service: name=td-agent state=restarted enabled=yes
+  service: name=td-agent state=restarted
   sudo: yes
 
-- name: reload redis
+- name: reload td-agent
   service: name=td-agent state=reloaded
   sudo: yes
