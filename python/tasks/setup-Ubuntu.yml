@@ -1,0 +1,8 @@
+# Python
+
+- name: Install Python packages
+  apt: pkg={{ item }}
+  with_items:
+    - python-dev
+    - python-pip
+    - python3-pip
