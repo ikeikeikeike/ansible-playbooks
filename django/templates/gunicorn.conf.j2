@@ -18,9 +18,9 @@ script
     gunicorn \
       -u {{username}} \
       -g {{username}} \
-      -b unix:{{app_home}}/var/run/gunicorn.sock \
-      --error-logfile={{app_home}}/var/log/gunicorn_error.log \
-      --access-logfile={{app_home}}/var/log/gunicorn_access.log \
+      -b unix:{{app_home}}/var/run/gunicorn_{{annual_key}}.sock \
+      --error-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_error.log \
+      --access-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_access.log \
       -k egg:meinheld#gunicorn_worker \
       --timeout=60 \
       --workers=3 \

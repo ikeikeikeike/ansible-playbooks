@@ -24,7 +24,12 @@
   apt: name={{ item }} state=installed update_cache=yes
   with_items:
     - mercurial
-  when: env != 'vagrant'
+    - python-virtualenv
+  when: ansible_os_family == 'Debian'
+
+- name: install dependencies...
+  yum: name=mercurial
+  when: ansible_os_family == 'RedHat'
 
 - name: Pull request to a project tree
   hg: repo={{hg_repo}}
@@ -33,32 +38,19 @@
   sudo_user: '{{username}}'
   when: env != 'vagrant'
 
+# venv
+
+- name: Ubuntu(setup)  specific tasks
+  include: venv-Ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: CentOS(setup) specific tasks
+  include: venv-CentOS.yml
+  when: ansible_os_family == 'RedHat'
+
+
 #### Django
 
-- name: check if virtualenv already exists
-  stat: path={{app_home}}/venv
-  register: venv_dir
-  sudo_user: '{{username}}'
-
-- name: create virtualenv for Django web app
-  shell: "virtualenv-3.4 -p `which python3` {{app_home}}/venv"
-  when: venv_dir.stat.isdir is not defined
-  sudo_user: '{{username}}'
-
-- name: install web application dependencies for django
-  pip: requirements={{app_home}}/{{app_name}}/requirements/general.txt 
-       virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
-
-- name: install web application dependencies for development
-  pip: requirements={{app_home}}/{{app_name}}/requirements/dev.txt
-       virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
-
-- name: install web application dependencies for testing
-  pip: requirements={{app_home}}/{{app_name}}/requirements/test.txt
-       virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
 
 - name: Django syncdb
   django_manage: 'command=syncdb app_path={{app_path}} 
@@ -75,12 +67,29 @@
                   virtualenv={{app_home}}/venv settings={{app_settings}}'
   sudo_user: '{{username}}'
 
+- name: Send Elasticsaerch analysis
+  django_manage: 'command=esinit app_path={{app_path}}
+                  virtualenv={{app_home}}/venv settings={{app_settings}}'
+  sudo_user: '{{username}}'
+  ignore_errors: yes
+
 ### Gunicorn
 
 - name: Add Gunicorn configuration for upstart.
   template: src=gunicorn.conf.j2
-            dest=/etc/init/gunicorn.conf
+            dest=/etc/init/gunicorn_{{annual_key}}.conf
+  when: ansible_os_family == 'Debian'
+
+- name: Add Gunicorn configuration for systemd.
+  template: src=gunicorn.service.j2
+            dest=/usr/lib/systemd/system/gunicorn_{{annual_key}}.service
+  when: ansible_os_family == 'RedHat'
+
+- name: Add Gunicorn enviroment configuration for systemd.
+  template: src=gunicorn.environment.j2
+            dest=/etc/sysconfig/gunicorn
+  when: ansible_os_family == 'RedHat'
 
 - name: register gunicorn service
-  service: name=gunicorn state=started enabled=yes
+  service: name=gunicorn_{{annual_key}} state=started enabled=yes
   ignore_errors: yes

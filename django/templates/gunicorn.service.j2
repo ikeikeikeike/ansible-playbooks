@@ -1,0 +1,29 @@
+[Unit]
+Description=Start the Gunicorn to {{app_name}} application. Run the Unicorn Workers for Django Application
+Documentation=
+
+[Service]
+### PIDFile={{app_home}}/run/gunicorn.pid
+### Type=simple
+User={{username}}
+Group={{username}}
+EnvironmentFile=/etc/sysconfig/gunicorn
+WorkingDirectory={{app_path}}
+
+ExecStart={{app_home}}/venv/bin/gunicorn -u {{username}} -g {{username}} -b unix:{{app_home}}/var/run/gunicorn_{{annual_key}}.sock --error-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_error.log --access-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_access.log -k egg:meinheld#gunicorn_worker --timeout=60 --workers=3 {{app_name}}.wsgi:application
+
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+# See MAX_OPEN_FILES in sysconfig
+LimitNOFILE=65535
+
+# See MAX_LOCKED_MEMORY in sysconfig, use "infinity" when MAX_LOCKED_MEMORY=unlimited and using bootstrap.mlockall: true
+#LimitMEMLOCK=infinity
+
+# Shutdown delay in seconds, before process is tried to be killed with KILL (if configured)
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
