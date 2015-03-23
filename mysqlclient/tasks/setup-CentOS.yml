@@ -1,0 +1,6 @@
+- name: MySQL | install build depends
+  yum: pkg={{ item }} state=present
+  with_items:
+    - mariadb 
+    - mariadb-devel
+    - MySQL-python
