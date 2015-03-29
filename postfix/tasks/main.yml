@@ -1,0 +1,7 @@
+- name: Ubuntu(setup)  specific tasks
+  include: setup-Ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: CentOS(setup) specific tasks
+  include: setup-CentOS.yml
+  when: ansible_os_family == 'RedHat'
