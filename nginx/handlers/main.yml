@@ -1,4 +1,3 @@
-# file: nginx/handlers/main.yml
 ---
 
 - name: restart nginx

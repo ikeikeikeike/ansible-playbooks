@@ -3,14 +3,13 @@
 
 # install, update, register service.
 
-# - name: apt-get update
-  # apt: update_cache=yes
-
-# - name: apt-get upgrade
-  # apt: upgrade=full
-
 - name: apt-get install nginx
   apt: name=nginx
+  when: ansible_os_family == 'Debian'
+
+- name: yum install nginx
+  yum: name=nginx
+  when: ansible_os_family == 'RedHat'
 
 - name: start nginx service
   service: name=nginx state=started enabled=yes
