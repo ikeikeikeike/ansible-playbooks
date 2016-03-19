@@ -65,12 +65,11 @@
   sudo_user: "{{ username }}"
 
 - name:  overwrite elixir initialization to profile
-  template: src=bash_profile.j2
-            dest=/etc/profile.d/elixir.sh
-            owner=root
-            group=root
-            mode=0755
-  sudo_user: "{{ username }}"
+  template: "src=bash_profile.j2
+            dest=/home/{{ username }}/.bash_profile
+            owner={{ username }}
+            group={{ username }}
+            mode=0644"
 
 - name:  check elixir-build installed
   command: test -x {{ exenv_root }}/plugins/elixir-build
@@ -91,7 +90,7 @@
   sudo_user: "{{ username }}"
 
 - name:  install elixir {{ elixir_version }}
-  shell: "{{ exenv_root }}/bin/exenv install {{ elixir_version }}"
+  shell: '/bin/bash -lc "{{ exenv_root }}/bin/exenv install {{ elixir_version }}"'
   when: elixir_installed | failed
   sudo_user: "{{ username }}"
 
