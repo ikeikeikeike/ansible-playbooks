@@ -3,8 +3,8 @@
 
 - name: restart td-agent
   service: name=td-agent state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload td-agent
   service: name=td-agent state=reloaded
-  sudo: yes
+  become: yes

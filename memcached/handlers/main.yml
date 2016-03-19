@@ -3,8 +3,8 @@
 
 - name: restart memcached
   service: name=memcached state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload memcached
   service: name=memcached state=reloaded
-  sudo: yes
+  become: yes

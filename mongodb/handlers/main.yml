@@ -3,8 +3,8 @@
 
 - name: restart mongodb
   service: name=mongodb state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload mongodb
   service: name=mongodb state=reloaded
-  sudo: yes
+  become: yes

@@ -3,8 +3,8 @@
 
 - name: restart monit
   service: name=monit state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload monit
   service: name=monit state=reloaded
-  sudo: yes
+  become: yes

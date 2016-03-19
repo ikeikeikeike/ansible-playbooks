@@ -1,11 +1,11 @@
 - name: restart nginx
   service: name=nginx state=restarted
-  sudo: yes
+  become: yes
 
 - name: restart redis
   service: name=redis state=restarted
-  sudo: yes
+  become: yes
 
 - name: restart memcached
   service: name=memcached state=restarted
-  sudo: yes
+  become: yes

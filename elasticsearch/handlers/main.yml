@@ -3,8 +3,8 @@
 
 - name: restart elasticsearch
   service: name=elasticsearch state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload elasticsearch
   service: name=elasticsearch state=reloaded
-  sudo: yes
+  become: yes

@@ -35,7 +35,7 @@
   hg: repo={{hg_repo}}
       dest={{app_home}}/{{app_name}}
       force=yes
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
   when: env != 'vagrant'
 
 # venv
@@ -55,22 +55,22 @@
 - name: Django syncdb
   django_manage: 'command=syncdb app_path={{app_path}} 
                   virtualenv={{app_home}}/venv settings={{app_settings}}'
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: Django migrate
   django_manage: 'command=migrate app_path={{app_path}} 
                   virtualenv={{app_home}}/venv settings={{app_settings}}'
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: Django collectstatic
   django_manage: 'command=collectstatic app_path={{app_path}}
                   virtualenv={{app_home}}/venv settings={{app_settings}}'
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: Send Elasticsaerch analysis
   django_manage: 'command=esinit app_path={{app_path}}
                   virtualenv={{app_home}}/venv settings={{app_settings}}'
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
   ignore_errors: yes
 
 ### Gunicorn

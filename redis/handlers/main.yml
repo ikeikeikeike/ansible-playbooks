@@ -3,8 +3,8 @@
 
 - name: restart redis
   service: name=redis-server state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload redis
   service: name=redis-server state=reloaded
-  sudo: yes
+  become: yes

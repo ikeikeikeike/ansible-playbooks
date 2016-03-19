@@ -1,24 +1,24 @@
 - name: check if virtualenv already exists
   stat: path={{app_home}}/venv
   register: venv_dir
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: create virtualenv for Django web app
   shell: "virtualenv -p `which python3` {{app_home}}/venv"
   when: venv_dir.stat.isdir is not defined
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: install web application dependencies for django
   pip: requirements={{app_home}}/{{app_name}}/requirements/general.txt 
        virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: install web application dependencies for development
   pip: requirements={{app_home}}/{{app_name}}/requirements/dev.txt
        virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'
 
 - name: install web application dependencies for testing
   pip: requirements={{app_home}}/{{app_name}}/requirements/test.txt
        virtualenv={{app_home}}/venv
-  sudo_user: '{{username}}'
+  become_user: '{{username}}'

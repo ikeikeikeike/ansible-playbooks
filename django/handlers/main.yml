@@ -3,8 +3,8 @@
 
 - name: restart gunicorn
   service: name=gunicorn state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload gunicorn
   service: name=gunicorn state=reloaded
-  sudo: yes
+  become: yes

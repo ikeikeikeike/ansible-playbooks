@@ -3,8 +3,8 @@
 
 - name: restart mysql
   service: name=mysql state=restarted
-  sudo: yes
+  become: yes
 
 - name: reload mysql
   service: name=mysql state=reloaded
-  sudo: yes
+  become: yes
