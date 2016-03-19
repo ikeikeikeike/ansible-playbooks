@@ -6,21 +6,21 @@
               line='ULIMIT="-n 65536"'
               backrefs=yes
 
-- name: Change ulimit for Redis.
-  notify: restart redis
-  ignore_errors: yes
-  lineinfile: dest=/etc/default/redis-server
-              regexp='^# ULIMIT=65536'
-              line='ULIMIT=65536'
-              backrefs=yes
+# - name: Change ulimit for Redis.
+  # notify: restart redis
+  # ignore_errors: yes
+  # lineinfile: dest=/etc/default/redis-server
+              # regexp='^# ULIMIT=65536'
+              # line='ULIMIT=65536'
+              # backrefs=yes
 
-- name: Change ulimit for memcached.
-  notify: restart memcached
-  ignore_errors: yes
-  lineinfile: dest=/etc/memcached.conf
-              regexp='^# -c 1024'
-              line='-c 65536'
-              backrefs=yes
+# - name: Change ulimit for memcached.
+  # notify: restart memcached
+  # ignore_errors: yes
+  # lineinfile: dest=/etc/memcached.conf
+              # regexp='^# -c 1024'
+              # line='-c 65536'
+              # backrefs=yes
 
 - name: Change ulimit for something(postgresql, elasticsearch).
   template: src=initscript.j2
