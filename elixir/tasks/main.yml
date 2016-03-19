@@ -56,11 +56,13 @@
 - name:  update exenv repo
   git: repo=https://github.com/mururu/exenv.git
        dest={{ exenv_root }}
+  sudo_user: "{{ username }}"
 
 - name:  add elixir to path
   file: path=/usr/local/bin/exenv
         src={{ exenv_root }}/bin/exenv
         state=link
+  sudo_user: "{{ username }}"
 
 - name:  overwrite elixir initialization to profile
   template: src=bash_profile.j2
@@ -68,30 +70,37 @@
             owner=root
             group=root
             mode=0755
+  sudo_user: "{{ username }}"
 
 - name:  check elixir-build installed
   command: test -x {{ exenv_root }}/plugins/elixir-build
   register: ebuild_present
   ignore_errors: yes
+  sudo_user: "{{ username }}"
 
 - name:  clone elixir-build repo
   git: repo=https://github.com/mururu/elixir-build.git
        dest={{ exenv_root }}/plugins/elixir-build
   when: ebuild_present | failed
+  sudo_user: "{{ username }}"
 
 - name:  check elixir {{ elixir_version }} installed
-  shell: exenv versions | grep {{ elixir_version }}
+  shell: "{{ exenv_root }}/bin/exenv versions | grep {{ elixir_version }}"
   register: elixir_installed
   ignore_errors: yes
+  sudo_user: "{{ username }}"
 
 - name:  install elixir {{ elixir_version }}
-  shell: exenv install {{ elixir_version }}
+  shell: "{{ exenv_root }}/bin/exenv install {{ elixir_version }}"
   when: elixir_installed | failed
+  sudo_user: "{{ username }}"
 
 - name:  rehash
-  shell: exenv rehash
+  shell: "{{ exenv_root }}/bin/exenv rehash"
   when: elixir_installed | failed
+  sudo_user: "{{ username }}"
 
 - name:  set global elixir {{ elixir_version }}
-  shell: exenv global {{ elixir_version }}
+  shell: "{{ exenv_root }}/bin/exenv global {{ elixir_version }}"
   when: elixir_installed | failed
+  sudo_user: "{{ username }}"

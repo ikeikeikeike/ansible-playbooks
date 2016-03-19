@@ -1,2 +1,4 @@
 source "{{ kerl_root }}/lib/erlang/{{ erlang_version }}/activate"
+
+export PATH="$HOME/.exenv/bin:$PATH"
 eval "$(exenv init -)"
