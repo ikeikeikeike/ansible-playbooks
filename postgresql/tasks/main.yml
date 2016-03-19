@@ -8,10 +8,10 @@
   with_items:
     - libpq5
     - libpq-dev
-    - postgresql-9.3
-    - postgresql-client-9.3
-    - postgresql-server-dev-9.3
-    - postgresql-contrib-9.3
+    - postgresql
+    - postgresql-client
+    - postgresql-server-dev-all
+    - postgresql-contrib
 
 - name: start postgresql service
   service: name=postgresql state=started enabled=yes
