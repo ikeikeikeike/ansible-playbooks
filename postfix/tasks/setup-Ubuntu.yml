@@ -1,0 +1,5 @@
+- name: Install postfix 
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items:
+    - postfix
+    - postfix-dev

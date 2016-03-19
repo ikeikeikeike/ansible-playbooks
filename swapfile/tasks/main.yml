@@ -3,9 +3,13 @@
   register: swapfile
   ignore_errors: yes
 
-- name: Create swap file
-  command: fallocate -l {{ swap_file_size_gb }}G {{ swap_file_path }}
-  when: swapfile.stdout.find('swap file') == -1
+- name: Ubuntu(setup)  specific tasks
+  include: setup-Ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: CentOS(setup) specific tasks
+  include: setup-CentOS.yml
+  when: ansible_os_family == 'RedHat'
 
 - name: Change swap file permissions
   file: path={{ swap_file_path }}

@@ -1,4 +1,7 @@
+# file: mysql/tasks/main.yml
 ---
+
+# install, update, register service.
 
 - name: Ubuntu(setup)  specific tasks
   include: setup-Ubuntu.yml

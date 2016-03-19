@@ -1,0 +1,30 @@
+description "Start the Gunicorn to thejob application. Run the Unicorn Workers for Django Application"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+console owner
+
+limit nofile 65536 65536
+
+chdir {{app_path}}
+
+env PATH="$PATH:{{app_home}}/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+env DJANGO_SETTINGS_MODULE={{app_settings}}
+env LC_ALL=ja_JP.UTF-8
+
+script
+  exec sudo -u {{ username }} env PATH=$PATH DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE LC_ALL=$LC_ALL \
+    gunicorn \
+      -u {{username}} \
+      -g {{username}} \
+      -b unix:{{app_home}}/var/run/gunicorn_{{annual_key}}.sock \
+      --error-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_error.log \
+      --access-logfile={{app_home}}/var/log/gunicorn_{{annual_key}}_access.log \
+      -k egg:meinheld#gunicorn_worker \
+      --timeout=60 \
+      --workers=3 \
+      {{app_name}}.wsgi:application >> /tmp/upstart.log 2>&1
+end script
+
+respawn limit 10 5

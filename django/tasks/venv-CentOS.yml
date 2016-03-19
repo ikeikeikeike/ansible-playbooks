@@ -1,0 +1,32 @@
+- name: check if virtualenv already exists
+  stat: path={{app_home}}/venv
+  register: venv_dir
+  sudo_user: '{{username}}'
+
+- name: create virtualenv for Django web app
+  shell: "pyvenv {{app_home}}/venv"
+  when: venv_dir.stat.isdir is not defined
+  sudo_user: '{{username}}'
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: install web application dependencies for django
+  pip: requirements={{app_home}}/{{app_name}}/requirements/general.txt 
+       virtualenv={{app_home}}/venv virtualenv_command=pyvenv
+  sudo_user: '{{username}}'
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: install web application dependencies for development
+  pip: requirements={{app_home}}/{{app_name}}/requirements/dev.txt
+       virtualenv={{app_home}}/venv virtualenv_command=pyvenv
+  sudo_user: '{{username}}'
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: install web application dependencies for testing
+  pip: requirements={{app_home}}/{{app_name}}/requirements/test.txt
+       virtualenv={{app_home}}/venv virtualenv_command=pyvenv
+  sudo_user: '{{username}}'
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"

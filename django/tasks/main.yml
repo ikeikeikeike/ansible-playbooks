@@ -1,0 +1,95 @@
+---
+
+#### Environment
+
+- name: Create home directory
+  file: path={{app_home}} state=directory 
+        owner={{username}} group={{username}} mode=0755
+
+- name: Create django var directory
+  file: path={{app_home}}/var state=directory 
+        owner={{username}} group={{username}} mode=0755
+
+- name: Create django log directory
+  file: path={{app_home}}/var/log state=directory 
+        owner={{username}} group={{username}} mode=0755
+
+- name: Create django run directory
+  file: path={{app_home}}/var/run state=directory 
+        owner={{username}} group={{username}} mode=0755
+
+#### Source code
+
+- name: install dependencies...
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items:
+    - mercurial
+    - python-virtualenv
+  when: ansible_os_family == 'Debian'
+
+- name: install dependencies...
+  yum: name=mercurial
+  when: ansible_os_family == 'RedHat'
+
+- name: Pull request to a project tree
+  hg: repo={{hg_repo}}
+      dest={{app_home}}/{{app_name}}
+      force=yes
+  sudo_user: '{{username}}'
+  when: env != 'vagrant'
+
+# venv
+
+- name: Ubuntu(setup)  specific tasks
+  include: venv-Ubuntu.yml
+  when: ansible_os_family == 'Debian'
+
+- name: CentOS(setup) specific tasks
+  include: venv-CentOS.yml
+  when: ansible_os_family == 'RedHat'
+
+
+#### Django
+
+
+- name: Django syncdb
+  django_manage: 'command=syncdb app_path={{app_path}} 
+                  virtualenv={{app_home}}/venv settings={{app_settings}}'
+  sudo_user: '{{username}}'
+
+- name: Django migrate
+  django_manage: 'command=migrate app_path={{app_path}} 
+                  virtualenv={{app_home}}/venv settings={{app_settings}}'
+  sudo_user: '{{username}}'
+
+- name: Django collectstatic
+  django_manage: 'command=collectstatic app_path={{app_path}}
+                  virtualenv={{app_home}}/venv settings={{app_settings}}'
+  sudo_user: '{{username}}'
+
+- name: Send Elasticsaerch analysis
+  django_manage: 'command=esinit app_path={{app_path}}
+                  virtualenv={{app_home}}/venv settings={{app_settings}}'
+  sudo_user: '{{username}}'
+  ignore_errors: yes
+
+### Gunicorn
+
+- name: Add Gunicorn configuration for upstart.
+  template: src=gunicorn.conf.j2
+            dest=/etc/init/gunicorn_{{annual_key}}.conf
+  when: ansible_os_family == 'Debian'
+
+- name: Add Gunicorn configuration for systemd.
+  template: src=gunicorn.service.j2
+            dest=/usr/lib/systemd/system/gunicorn_{{annual_key}}.service
+  when: ansible_os_family == 'RedHat'
+
+- name: Add Gunicorn enviroment configuration for systemd.
+  template: src=gunicorn.environment.j2
+            dest=/etc/sysconfig/gunicorn
+  when: ansible_os_family == 'RedHat'
+
+- name: register gunicorn service
+  service: name=gunicorn_{{annual_key}} state=started enabled=yes
+  ignore_errors: yes

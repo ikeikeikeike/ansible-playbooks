@@ -1,0 +1,3 @@
+go_tarball: go1.4.1.linux-amd64.tar.gz
+go_checksum: 68170d5d48fc317155e69d2b55e4c09878433462ddb77d7900db6590ce2bef49
+go_version_target: go version go1.4.1 linux/amd64

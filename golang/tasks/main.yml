@@ -1,0 +1,17 @@
+- name: download Golang tarball
+  get_url: url=https://storage.googleapis.com/golang/{{ go_tarball }}
+           dest=/tmp/{{ go_tarball }}
+           sha256sum={{ go_checksum }}
+
+- name: register the current Golang version (if any)
+  command: /usr/local/go/bin/go version
+  ignore_errors: yes
+  register: go_version
+
+- name: extract Golang tarball
+  command: tar -C /usr/local -xf /tmp/{{ go_tarball }}
+  when: go_version|failed or go_version.stdout != go_version_target
+
+- name: add Golang binary to PATH
+  lineinfile: dest=/etc/profile.d/go-bin.sh line="export PATH=$PATH:/usr/local/go/bin"
+              create=yes

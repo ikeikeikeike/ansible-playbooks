@@ -1,0 +1,56 @@
+- name: Install build utility
+  yum: name={{ item }} state=latest
+  with_items:
+    - zlib-devel 
+    - bzip2-devel 
+    - openssl-devel 
+    - ncurses-devel 
+    - sqlite-devel 
+    - readline-devel 
+    - tk-devel 
+    - gdbm-devel 
+    - db4-devel 
+    - libpcap-devel 
+    - xz-devel
+
+# Python
+
+- name: Install Python packages
+  yum: name=python-devel state=latest
+
+- name: Download Python tarball
+  get_url: url=https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz dest=/usr/local/src
+
+- name: check if python already exists
+  stat: path=/usr/local/src/Python-3.4.3
+  register: python_dir
+
+- name: Check if python is installed
+  command: tar zxvf Python-3.4.3.tgz chdir=/usr/local/src
+  when: python_dir.stat.isdir is not defined
+
+- name: Install Python
+  shell: >
+    ./configure
+    --prefix=/usr/local
+    --enable-shared && make && make install
+    chdir=/usr/local/src/Python-3.4.3
+  when: python_dir.stat.isdir is not defined
+
+- name: Symlink to Python
+  file: src=/usr/local/bin/python3 
+        dest=/usr/local/bin/python 
+        state=link
+  when: python_dir.stat.isdir is not defined
+
+- name: Set python library path to ld.so.conf 
+  lineinfile: dest=/etc/ld.so.conf 
+              line=/usr/local/lib
+  notify: reload_ldconfig
+  when: python_dir.stat.isdir is not defined
+
+- name: load ldconfig
+  command: ldconfig
+  when: python_dir.stat.isdir is not defined
+
+# Secure: SSH Guardがパッチ見CentOSにはないためいれない
