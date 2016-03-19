@@ -1,0 +1,5 @@
+kerl_root: /usr/local/kerl
+erlang_version: 18.3
+
+exenv_root: /usr/local/exenv
+elixir_version: 1.2.3

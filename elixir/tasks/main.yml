@@ -1,0 +1,97 @@
+# file: elixir/tasks/main.yml
+---
+
+
+# Installing Environment
+
+
+- name:  install build depends
+  apt: pkg={{ item }}
+  with_items:
+      - build-essential
+      - git
+      - wget
+      - libssl-dev
+      - libreadline-dev
+      - libncurses5-dev
+      - zlib1g-dev
+      - m4
+      - curl
+      - wx-common
+      - libwxgtk3.0-dev
+
+
+# Installing erlang
+
+- name: download kerl
+  get_url: url=https://raw.githubusercontent.com/spawngrid/kerl/master/kerl
+           dest="/usr/local/bin/kerl"
+
+- name: change 0644 permission to kerl
+  file: path=/usr/local/bin/kerl mode=0555
+
+- name:  check erlang {{ erlang_version }} installed
+  shell: "/usr/local/bin/kerl list builds | grep {{ erlang_version }}"
+  register: erlang_installed
+  ignore_errors: yes
+
+- name:  install erlang {{ erlang_version }}
+  shell: "/usr/local/bin/kerl build {{ erlang_version }} /tmp/{{ erlang_version }}"
+  when: erlang_installed | failed
+
+- name:  create kerl directory
+  file: dest={{ kerl_root }}/lib/erlang/{{ erlang_version }}
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+  when: erlang_installed | failed
+
+- name:  install erlang {{ erlang_version }}
+  shell: "/usr/local/bin/kerl install /tmp/{{ erlang_version }} {{ kerl_root }}/lib/erlang/{{ erlang_version }}/"
+  when: erlang_installed | failed
+
+# Installing elixir
+
+- name:  update exenv repo
+  git: repo=https://github.com/mururu/exenv.git
+       dest={{ exenv_root }}
+
+- name:  add elixir to path
+  file: path=/usr/local/bin/exenv
+        src={{ exenv_root }}/bin/exenv
+        state=link
+
+- name:  overwrite elixir initialization to profile
+  template: src=bash_profile.j2
+            dest=/etc/profile.d/elixir.sh
+            owner=root
+            group=root
+            mode=0755
+
+- name:  check elixir-build installed
+  command: test -x {{ exenv_root }}/plugins/elixir-build
+  register: ebuild_present
+  ignore_errors: yes
+
+- name:  clone elixir-build repo
+  git: repo=https://github.com/mururu/elixir-build.git
+       dest={{ exenv_root }}/plugins/elixir-build
+  when: ebuild_present | failed
+
+- name:  check elixir {{ elixir_version }} installed
+  shell: exenv versions | grep {{ elixir_version }}
+  register: elixir_installed
+  ignore_errors: yes
+
+- name:  install elixir {{ elixir_version }}
+  shell: exenv install {{ elixir_version }}
+  when: elixir_installed | failed
+
+- name:  rehash
+  shell: exenv rehash
+  when: elixir_installed | failed
+
+- name:  set global elixir {{ elixir_version }}
+  shell: exenv global {{ elixir_version }}
+  when: elixir_installed | failed
