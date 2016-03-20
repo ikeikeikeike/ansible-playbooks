@@ -17,7 +17,7 @@
     - htop
     - git-core
     - sysv-rc-conf
-
+    - language-pack-ja
 
 # Python
 

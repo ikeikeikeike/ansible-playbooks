@@ -58,12 +58,6 @@
        dest={{ exenv_root }}
   sudo_user: "{{ username }}"
 
-- name:  add elixir to path
-  file: path=/usr/local/bin/exenv
-        src={{ exenv_root }}/bin/exenv
-        state=link
-  sudo_user: "{{ username }}"
-
 - name:  overwrite elixir initialization to profile
   template: "src=bash_profile.j2
             dest=/home/{{ username }}/.bash_profile
