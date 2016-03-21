@@ -8,10 +8,10 @@
   }
 
   server {
-    listen 8080;
+    listen 80;
     server_name {{ inventory_hostname }};
 
-    root /home/{{ username }}/var/current/public;
+    root /home/{{ username }}/rel/exblur/static;
 
     access_log /var/log/nginx/video_access.log;
     error_log /var/log/nginx/video_error.log;
@@ -78,7 +78,7 @@
         proxy_cache_valid      200 302 30d;  # cache time
         proxy_cache_valid      any 1m;
 
-        # proxy_cache_bypass     $http_cache_purge;
+        # proxy_cache_bypass   $http_cache_purge;
         add_header             X-Cached $upstream_cache_status;
 
         proxy_http_version     1.1;
