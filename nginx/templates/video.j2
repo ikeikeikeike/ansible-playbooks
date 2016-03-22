@@ -35,6 +35,20 @@
           set $mobile 2;
       }
 
+      # accept-language: en,en-US;q=0.8,ja;q=0.6
+      set $first_language $http_accept_language;
+      if ($http_accept_language ~* '^(.+?),') {
+          set $first_language $1;
+      }
+
+      set $language_suffix 'en';
+      if ($first_language ~* 'ja') {
+          set $language_suffix 'ja';
+      }
+      if ($first_language ~* 'es') {
+          set $language_suffix 'es';
+      }
+
       # Caching extension below + get method
       set $do_not_cache 0;
       if ($request_method != GET) {
@@ -50,7 +64,7 @@
       proxy_no_cache        $do_not_cache;
       proxy_cache_bypass    $do_not_cache;
       proxy_cache           cache_static_file;
-      proxy_cache_key       $scheme$host$uri$is_args$args$mobile;
+      proxy_cache_key       $scheme$host$uri$is_args$args$mobile$language_suffix;
       proxy_ignore_headers  X-Accel-Redirect X-Accel-Expires Cache-Control Expires Set-Cookie;
       proxy_cache_valid     200 302 30m;  # cache time
       proxy_cache_valid     any 3m;
