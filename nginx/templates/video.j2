@@ -8,6 +8,11 @@
   }
 
   server {
+      server_name www.{{ inventory_hostname }};
+      return 301 $scheme://{{ inventory_hostname }}$request_uri;
+  }
+
+  server {
     listen 80;
     server_name {{ inventory_hostname }};
 
