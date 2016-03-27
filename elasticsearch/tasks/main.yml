@@ -26,7 +26,7 @@
   register: kuromoji_path
 
 - name: download kuromoji plugin for elasticsearch.
-  command: /usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-analysis-kuromoji/2.7.0
+  command: /usr/share/elasticsearch/bin/plugin -install org.codelibs/elasticsearch-analysis-kuromoji-neologd/1.7.1
   notify: restart elasticsearch
   when: kuromoji_path.stat.exists == False
 
@@ -64,6 +64,6 @@
 - name: replace elasticsearch.yml for directive
   notify: restart elasticsearch
   lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
-               regexp='^index.analysis.analyzer.default.tokenizer: kuromoji_tokenizer'
-               line='index.analysis.analyzer.default.tokenizer: kuromoji_tokenizer'
+               regexp='^index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
+               line='index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
                insertafter='^index.analysis.analyzer.default.type: custom'"
