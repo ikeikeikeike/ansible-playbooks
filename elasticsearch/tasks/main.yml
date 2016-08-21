@@ -3,12 +3,12 @@
 
 # install, update, register service.
 
-- name: apt-get install openjdk-7-jre-headless
-  apt: name=openjdk-7-jre-headless
+- name: apt-get install openjdk-8-jre-headless
+  apt: name=openjdk-9-jre-headless
 
 - name: download elasticsearch
-  get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.5.deb
-           dest=/usr/local/src/elasticsearch-1.7.5.deb
+  get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.5.deb
+           dest=/usr/local/src/elasticsearch-2.3.5.deb
 
 - name: Check if elasticsearch is installed
   command: dpkg -l elasticsearch
@@ -16,7 +16,7 @@
   ignore_errors: True
 
 - name: install elasticsearch by dpkg
-  command: dpkg -i /usr/local/src/elasticsearch-1.7.5.deb
+  command: dpkg -i /usr/local/src/elasticsearch-2.3.5.deb
   when: is_installed_elasticsearch.stdout.find('elasticsearch') == -1
 
 - name: start elasticsearch service
@@ -26,7 +26,7 @@
   register: kuromoji_path
 
 - name: download kuromoji plugin for elasticsearch.
-  command: /usr/share/elasticsearch/bin/plugin -install org.codelibs/elasticsearch-analysis-kuromoji-neologd/1.7.1
+  command: /usr/share/elasticsearch/bin/plugin install org.codelibs/elasticsearch-analysis-kuromoji-neologd/2.3.1
   notify: restart elasticsearch
   when: kuromoji_path.stat.exists == False
 
@@ -54,16 +54,16 @@
                line='network.host: 127.0.0.1'
                backrefs=yes"
 
-- name: replace elasticsearch.yml for index.analysis.analyzer.default.type directive
-  notify: restart elasticsearch
-  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
-               regexp='^index.analysis.analyzer.default.type: custom'
-               line='index.analysis.analyzer.default.type: custom'
-               insertafter='^network.host: 127.0.0.1'"
+# - name: replace elasticsearch.yml for index.analysis.analyzer.default.type directive
+  # notify: restart elasticsearch
+  # lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               # regexp='^index.analysis.analyzer.default.type: custom'
+               # line='index.analysis.analyzer.default.type: custom'
+               # insertafter='^network.host: 127.0.0.1'"
 
-- name: replace elasticsearch.yml for directive
-  notify: restart elasticsearch
-  lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
-               regexp='^index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
-               line='index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
-               insertafter='^index.analysis.analyzer.default.type: custom'"
+# - name: replace elasticsearch.yml for directive
+  # notify: restart elasticsearch
+  # lineinfile: "dest=/etc/elasticsearch/elasticsearch.yml
+               # regexp='^index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
+               # line='index.analysis.analyzer.default.tokenizer: kuromoji_neologd_tokenizer'
+               # insertafter='^index.analysis.analyzer.default.type: custom'"

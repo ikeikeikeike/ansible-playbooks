@@ -1,18 +1,18 @@
-- name: Change ulimit for Nginx
-  notify: restart nginx
-  ignore_errors: yes
-  lineinfile: dest=/etc/default/nginx
-              regexp='^#ULIMIT="-n 4096"'
-              line='ULIMIT="-n 65536"'
-              backrefs=yes
-
-# - name: Change ulimit for Redis.
-  # notify: restart redis
+# - name: Change ulimit for Nginx
+  # notify: restart nginx
   # ignore_errors: yes
-  # lineinfile: dest=/etc/default/redis-server
-              # regexp='^# ULIMIT=65536'
-              # line='ULIMIT=65536'
+  # lineinfile: dest=/etc/default/nginx
+              # regexp='^#ULIMIT="-n 4096"'
+              # line='ULIMIT="-n 65536"'
               # backrefs=yes
+
+- name: Change ulimit for Redis.
+  notify: restart redis
+  ignore_errors: yes
+  lineinfile: dest=/etc/default/redis-server
+              regexp='^# ULIMIT=65536'
+              line='ULIMIT=65536'
+              backrefs=yes
 
 # - name: Change ulimit for memcached.
   # notify: restart memcached

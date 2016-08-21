@@ -1,0 +1,57 @@
+# file: nginx/tasks/main.yml
+---
+
+- name: Install system utility
+  apt: pkg={{ item }}
+  with_items:
+    - libreadline-dev
+    - libncurses5-dev
+    - libpcre3-dev
+    - libssl-dev
+    - perl
+    - make
+    - build-essential
+    - golang-go
+
+- name: Overwrite /etc/default/go
+  template: src=golang.j2 dest=/etc/profile.d/golang.sh
+
+# - name: download nginx-build
+  # command: GOPATH=$HOME/go go get github.com/cubicdaiya/nginx-build
+
+# - name: download nginx-build
+  # command: nginx-build -d work -openresty -pcre -openssl
+
+# Configurations
+
+# - name: replace nginx.conf for worker_connections directive
+  # lineinfile: dest=/etc/nginx/nginx.conf
+              # regexp='worker_connections 768;'
+              # line='\tuse epoll;\n\tworker_connections 1024;'
+              # backrefs=yes
+  # notify: restart nginx
+
+# - name: replace nginx.conf for server_tokens directive
+  # lineinfile: dest=/etc/nginx/nginx.conf
+              # regexp='# server_tokens off;'
+              # line='\tserver_tokens off;'
+              # backrefs=yes
+  # notify: restart nginx
+
+# - name: remove default configuration
+  # file: name=/etc/nginx/sites-enabled/default state=absent
+  # notify: restart nginx
+
+# - name: Create video configuration to sites-availavle
+  # template: src=video.j2 dest=/etc/nginx/sites-available/video
+  # notify: restart nginx
+
+# - name: Video configuraitons to conf.d dir.
+  # template: src=video.conf.j2 dest=/etc/nginx/conf.d/video.conf
+  # notify: restart nginx
+
+# - name: symbolic link from sites-availavle to sites-enabled
+  # file: src=/etc/nginx/sites-available/video
+        # dest=/etc/nginx/sites-enabled/video
+        # state=link
+  # notify: restart nginx

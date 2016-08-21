@@ -3,7 +3,7 @@
 
 # install, update, register service.
 
-- name: rbenv | install build depends
+- name: install build depends
   apt: pkg={{ item }}
   with_items:
     - libpq5

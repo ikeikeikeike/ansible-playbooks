@@ -12,8 +12,12 @@
 
 # Configurations
 
-- name: Create monitering file for varnishd. /etc/monit/conf.d/varnishd
-  template: src=varnishd.j2 dest=/etc/monit/conf.d/varnishd
+# - name: Create monitering file for nginx. /etc/monit/conf.d/nginx
+  # template: src=nginx.j2 dest=/etc/monit/conf.d/nginx
+  # notify: restart monit
+
+- name: Create monitering file for elasticsearch. /etc/monit/conf.d/elasticsearch
+  template: src=elasticsearch.j2 dest=/etc/monit/conf.d/elasticsearch
   notify: restart monit
 
 - name: replace /etc/monit/monitrc
