@@ -1,7 +1,7 @@
 # Proxy cache configuration
 #
-proxy_cache_path /tmp/static_file_cache levels=1:2 keys_zone=cache_static_file:512m inactive=5d max_size=1024m;
-proxy_cache_path /tmp/edge_file_cache levels=1:2 keys_zone=cache_edge_file:512m inactive=7d max_size=1024m;
+proxy_cache_path /tmp/static_file_cache levels=1:2 keys_zone=cache_static_file:512m inactive=5d max_size=10240m;
+proxy_cache_path /tmp/edge_file_cache levels=1:2 keys_zone=cache_edge_file:512m inactive=7d max_size=10240m;
 proxy_temp_path /tmp/temp;
 
 
