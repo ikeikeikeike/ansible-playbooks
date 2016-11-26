@@ -55,9 +55,12 @@
       }
 
       # Caching extension below + get method
-      set $do_not_cache 0;
-      if ($request_method != GET) {
-          set $do_not_cache 1;
+      set $do_not_cache 1;
+      if ($request_method = GET) {
+          set $do_not_cache 0;
+      }
+      if ($request_method = HEAD) {
+          set $do_not_cache 0;
       }
 
       # ignore sid in cookie
@@ -85,6 +88,8 @@
     }
 
     location ~* ^/edge/(.*) {
+        access_log off;
+
         proxy_set_header       Host 'static.{{ inventory_hostname }}';
         proxy_set_header       Authorization '';
         proxy_hide_header      x-amz-id-2;
@@ -106,18 +111,24 @@
     }
 
     location /_/scs/apps-static/ {
+        access_log off;
+
         # for googleplus counter
         break;
     }
 
     location ~* \.(xml\.gz)(\?[0-9]+)?$ {
-      # 上記拡張子をno cache
-      break;
+        access_log off;
+
+        # 上記拡張子をno cache
+        break;
     }
 
     location ~* \.(pdf|ico|css|js|gif|jpe?g|png|ttf|eot|svg|woff|test)(\?[0-9]+)?$ {
-      # 上記拡張子を1日cache
-      expires 1d;
+        access_log off;
+
+        # 上記拡張子を1日cache
+        expires 1d;
     }
 
   }
