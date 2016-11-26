@@ -7,8 +7,8 @@
   apt: name=openjdk-9-jre-headless
 
 - name: download elasticsearch
-  get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.5.deb
-           dest=/usr/local/src/elasticsearch-2.3.5.deb
+  get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.4.1.deb
+           dest=/usr/local/src/elasticsearch-2.4.1.deb
 
 - name: Check if elasticsearch is installed
   command: dpkg -l elasticsearch
@@ -16,7 +16,7 @@
   ignore_errors: True
 
 - name: install elasticsearch by dpkg
-  command: dpkg -i /usr/local/src/elasticsearch-2.3.5.deb
+  command: dpkg -i /usr/local/src/elasticsearch-2.4.1.deb
   when: is_installed_elasticsearch.stdout.find('elasticsearch') == -1
 
 - name: start elasticsearch service
@@ -26,7 +26,7 @@
   register: kuromoji_path
 
 - name: download kuromoji plugin for elasticsearch.
-  command: /usr/share/elasticsearch/bin/plugin install org.codelibs/elasticsearch-analysis-kuromoji-neologd/2.3.1
+  command: /usr/share/elasticsearch/bin/plugin install org.codelibs/elasticsearch-analysis-kuromoji-neologd/2.4.1
   notify: restart elasticsearch
   when: kuromoji_path.stat.exists == False
 
